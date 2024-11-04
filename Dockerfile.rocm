@@ -1,0 +1,59 @@
+# Use ROCm base image
+FROM rocm/pytorch:rocm5.4.2_ubuntu22.04_py3.11_pytorch_2.0.0
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11-dev \
+    python3-pip \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libsentencepiece-dev \
+    curl \
+    gcc \
+    g++ \
+    cmake \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set Python 3.11 as default
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+
+# Upgrade pip and install base packages
+RUN pip install --upgrade pip setuptools wheel
+
+# Set PYTHONPATH correctly
+ENV PYTHONPATH=/app
+
+# Set environment variables
+ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+ENV PYTHONUNBUFFERED=1
+
+# Copy the requirements file into the container
+COPY requirements_rocm.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements_rocm.txt
+
+# Copy the rest of the application code
+COPY . .
+
+# Set up the environment and logging
+RUN python -m pip install --upgrade pip && \
+    python -c "from config.env_config import setup_environment; setup_environment()"
+RUN python -c "from pathlib import Path; from config.logging_config import setup_logging; setup_logging(Path('flux_pipeline.log'))"
+
+# Expose Gradio application port
+EXPOSE 7860
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:7860/ || exit 1
+
+# Set the command to run the application
+CMD ["python3", "-u", "gui.py", "--host", "0.0.0.0", "--port", "7860", "--share"]
