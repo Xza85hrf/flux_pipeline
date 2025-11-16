@@ -226,3 +226,9 @@ exclude_lines = [
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
 ]
+
+# Bandit security linter configuration
+[tool.bandit]
+exclude_dirs = ["/tests", "/venv", "/.venv", "/.git"]
+skips = ["B101"]  # Skip assert_used (common in tests)
+
