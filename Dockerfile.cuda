@@ -53,11 +53,6 @@ ENV PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 ENV PYTHONUNBUFFERED=1
 
-# Set up the environment and logging
-RUN python -m pip install --upgrade pip && \
-    python -c "from config.env_config import setup_environment; setup_environment()"
-RUN python -c "from pathlib import Path; from config.logging_config import setup_logging; setup_logging(Path('flux_pipeline.log'))"
-
 # Expose the application port
 EXPOSE 7860
 
