@@ -1,0 +1,86 @@
+# Production environment configuration for FluxPipeline
+# Use with: export FLUXPIPELINE_ENV=production
+
+# Environment name
+environment: production
+
+# Logging configuration
+logging:
+  level: INFO
+  file: /var/log/flux_pipeline/flux_pipeline.log
+  console: false
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  rotation:
+    max_bytes: 10485760  # 10MB
+    backup_count: 5
+
+# GPU configuration
+gpu:
+  vendor: cuda
+  visible_devices: "0,1,2,3"  # All available GPUs
+  memory_threshold: 0.9
+  auto_select_best: true
+
+# Model configuration
+model:
+  name: black-forest-labs/FLUX.1-schnell
+  torch_dtype: float16
+  cache_dir: /var/cache/huggingface
+  attention_slicing: false  # Disabled for production performance
+  enable_model_cpu_offload: false
+  preload_model: true
+
+# Generation defaults
+generation:
+  default_height: 1024
+  default_width: 1024
+  default_steps: 4
+  default_guidance_scale: 0.0
+  seed_profile: balanced
+  max_height: 2048
+  max_width: 2048
+
+# Workspace configuration
+workspace:
+  base_dir: /var/lib/flux_pipeline/workspace
+  create_timestamped_dirs: true
+  save_metadata: true
+  cleanup_old_files: true
+  max_age_days: 7
+
+# Performance settings
+performance:
+  enable_profiling: false
+  enable_metrics: true
+  save_metrics: true
+  metrics_file: /var/lib/flux_pipeline/metrics.json
+  metrics_rotation_days: 30
+
+# Debug settings
+debug:
+  save_intermediate_outputs: false
+  verbose_errors: false
+  enable_memory_tracking: true
+  log_model_info: false
+
+# Safety settings
+safety:
+  max_batch_size: 100
+  timeout_seconds: 600
+  enable_oom_protection: true
+  enable_rate_limiting: true
+  rate_limit_per_minute: 60
+
+# Monitoring
+monitoring:
+  enable_health_checks: true
+  health_check_port: 7861
+  prometheus_metrics: true
+  prometheus_port: 9090
+
+# Security
+security:
+  validate_prompts: true
+  max_prompt_length: 10000
+  sanitize_filenames: true
+  enable_content_filtering: false

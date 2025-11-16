@@ -7,18 +7,36 @@ including mock GPU environments, test data generators, and common test utilities
 import sys
 import os
 import pytest
-import torch
-import PIL.Image
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 from typing import Dict, Any, Generator
 import asyncio
+
+# Make PIL import optional
+try:
+    import PIL.Image
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
+    PIL = None
+
+# Try to import torch, but make it optional
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    torch = None
 
 # Add the main package directory to the system path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 def pytest_configure(config):
     """Configure pytest with custom settings."""
+    if not TORCH_AVAILABLE:
+        print("WARNING: PyTorch is not available. GPU tests will be skipped.")
+        return
+
     try:
         import torch.cuda
         if torch.cuda.is_available():
@@ -32,6 +50,13 @@ def pytest_configure(config):
 
 def pytest_collection_modifyitems(config, items):
     """Skip GPU tests if CUDA is not available."""
+    if not TORCH_AVAILABLE:
+        skip_gpu = pytest.mark.skip(reason="PyTorch is not available")
+        for item in items:
+            if "gpu" in item.keywords:
+                item.add_marker(skip_gpu)
+        return
+
     try:
         import torch.cuda
         if not torch.cuda.is_available():
@@ -71,6 +96,9 @@ def mock_cuda_available():
 @pytest.fixture
 def mock_hip():
     """Mock AMD HIP support."""
+    if not TORCH_AVAILABLE:
+        pytest.skip("PyTorch not available")
+
     mock_hip = MagicMock()
     mock_hip.is_available.return_value = True
     mock_hip.device_count.return_value = 2
@@ -150,6 +178,9 @@ def mock_system_memory():
 @pytest.fixture
 def mock_cuda_error():
     """Simulate CUDA out of memory error."""
+    if not TORCH_AVAILABLE:
+        pytest.skip("PyTorch not available")
+
     def raise_oom(*args, **kwargs):
         raise torch.cuda.OutOfMemoryError("CUDA out of memory")
     return raise_oom

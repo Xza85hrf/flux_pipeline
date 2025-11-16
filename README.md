@@ -1,5 +1,14 @@
 # FluxPipeline
 
+[![Tests](https://github.com/Xza85hrf/flux_pipeline/workflows/Tests/badge.svg)](https://github.com/Xza85hrf/flux_pipeline/actions/workflows/tests.yml)
+[![Code Quality](https://github.com/Xza85hrf/flux_pipeline/workflows/Code%20Quality/badge.svg)](https://github.com/Xza85hrf/flux_pipeline/actions/workflows/lint.yml)
+[![Security Scan](https://github.com/Xza85hrf/flux_pipeline/workflows/Security%20Scan/badge.svg)](https://github.com/Xza85hrf/flux_pipeline/actions/workflows/security.yml)
+[![Docker Build](https://github.com/Xza85hrf/flux_pipeline/workflows/Docker%20Build/badge.svg)](https://github.com/Xza85hrf/flux_pipeline/actions/workflows/docker.yml)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
 FluxPipeline is a prototype experimental project that provides a framework for working with the **FLUX.1-schnell** image generation model. This project is intended for educational and experimental purposes only.
 
 ## Table of Contents
@@ -97,7 +106,7 @@ FluxPipeline can be installed using a virtual environment (recommended) or via D
 Before proceeding, ensure you have the following installed:
 
 - **Git:** [Download and install Git](https://git-scm.com/downloads)
-- **Python 3.8 or higher:** [Download and install Python](https://www.python.org/downloads/)
+- **Python 3.10 or higher:** [Download and install Python](https://www.python.org/downloads/) (Python 3.11-3.13 recommended)
 - **Anaconda (Recommended):** [Download and install Anaconda](https://www.anaconda.com/products/distribution)
 - **Docker:** [Download and install Docker](https://docs.docker.com/get-docker/) (if using Docker installation)
 
@@ -117,11 +126,11 @@ We recommend using Anaconda to manage your Python environments. Detailed instruc
    Create and activate a conda environment to isolate project dependencies.
 
    ```bash
-   conda create -n flux python=3.11 -y
+   conda create -n flux python=3.12 -y
    conda activate flux
    ```
 
-   *Explanation:* This creates a new environment named `flux` with Python 3.11.
+   *Explanation:* This creates a new environment named `flux` with Python 3.12. You can also use Python 3.11 or 3.13.
 
 3. **Install Dependencies**
 

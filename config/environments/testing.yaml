@@ -1,0 +1,69 @@
+# Testing environment configuration for FluxPipeline
+# Use with: export FLUXPIPELINE_ENV=testing or pytest --env=testing
+
+# Environment name
+environment: testing
+
+# Logging configuration
+logging:
+  level: WARNING
+  file: /tmp/flux_pipeline_test.log
+  console: true
+  format: "%(levelname)s - %(message)s"
+
+# GPU configuration
+gpu:
+  vendor: cpu  # Use CPU for testing unless GPU tests are explicitly run
+  visible_devices: "0"
+  memory_threshold: 0.75
+
+# Model configuration
+model:
+  name: black-forest-labs/FLUX.1-schnell
+  torch_dtype: float32
+  cache_dir: /tmp/huggingface_cache_test
+  attention_slicing: true
+  enable_model_cpu_offload: true
+  skip_model_download: false  # Set to true if testing without model
+
+# Generation defaults
+generation:
+  default_height: 256  # Very small for fast tests
+  default_width: 256
+  default_steps: 1  # Minimum steps for testing
+  default_guidance_scale: 0.0
+  seed_profile: conservative
+
+# Workspace configuration
+workspace:
+  base_dir: /tmp/flux_pipeline_test_workspace
+  create_timestamped_dirs: false
+  save_metadata: false
+  cleanup_on_exit: true
+
+# Performance settings
+performance:
+  enable_profiling: false
+  enable_metrics: false
+  save_metrics: false
+
+# Debug settings
+debug:
+  save_intermediate_outputs: false
+  verbose_errors: true
+  enable_memory_tracking: false
+  log_model_info: false
+
+# Safety settings
+safety:
+  max_batch_size: 5
+  timeout_seconds: 60
+  enable_oom_protection: true
+
+# Test-specific settings
+testing:
+  use_mock_model: false  # Enable to skip actual model loading
+  use_mock_generation: false  # Enable to skip actual generation
+  fail_fast: true
+  parallel_execution: false
+  cleanup_temp_files: true

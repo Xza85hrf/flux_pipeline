@@ -67,7 +67,8 @@ def load_history():
         try:
             with open(HISTORY_FILE, "r") as f:
                 return json.load(f)
-        except:
+        except (json.JSONDecodeError, IOError) as e:
+            logger.warning(f"Failed to load history file: {e}")
             return []
     return []
 
@@ -1287,7 +1288,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Print the custom URLs
-    print(f"* Running on local URL:  http://localhost:{args.port}")
+    logger.info(f"Starting Gradio interface on http://localhost:{args.port}")
 
     # Create and launch the interface
     demo = create_interface()

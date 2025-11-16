@@ -39,7 +39,6 @@ Note:
 from datetime import datetime
 import os
 import gc
-import torch
 import psutil
 import platform
 from enum import Enum
@@ -47,6 +46,14 @@ from dataclasses import dataclass
 from typing import Dict, Any, Optional, List, Tuple
 from pathlib import Path
 from config.logging_config import logger
+
+# Make torch import optional
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    torch = None
 
 
 class GPUVendor(Enum):
@@ -122,7 +129,7 @@ class MemoryManager:
 
     def __init__(self, memory_threshold: float = 0.90):
         """Initialize memory manager with specified threshold.
-        
+
         Args:
             memory_threshold (float, optional): Maximum memory utilization threshold
                 between 0 and 1. Defaults to 0.90 (90%).
@@ -133,7 +140,8 @@ class MemoryManager:
         self._detect_gpus()
         self.device = self._get_optimal_device()
         # Initialize CUDA settings early for optimal performance
-        self._initialize_cuda_settings()
+        if TORCH_AVAILABLE:
+            self._initialize_cuda_settings()
 
     def _initialize_cuda_settings(self):
         """Initialize CUDA settings for optimal memory usage.
@@ -203,6 +211,10 @@ class MemoryManager:
     def _detect_gpus(self):
         """Detect and initialize all available GPUs from different vendors."""
         self.available_gpus = []
+
+        if not TORCH_AVAILABLE:
+            logger.warning("PyTorch is not available. No GPUs detected. Using CPU.")
+            return
 
         # Primary check for NVIDIA GPUs
         if torch.cuda.is_available():
@@ -291,12 +303,16 @@ class MemoryManager:
         except Exception as e:
             logger.debug(f"Intel GPU detection skipped: {e}")
 
-    def _get_optimal_device(self) -> torch.device:
+    def _get_optimal_device(self):
         """Select the optimal GPU device based on availability and capabilities.
-        
+
         Returns:
-            torch.device: Selected compute device (GPU or CPU)
+            torch.device or None: Selected compute device (GPU or CPU)
         """
+        if not TORCH_AVAILABLE:
+            logger.warning("PyTorch not available, no device selected")
+            return None
+
         if not torch.cuda.is_available():
             logger.warning("CUDA not available, using CPU")
             return torch.device("cpu")
@@ -351,7 +367,8 @@ class MemoryManager:
                 )
                 if temperature is not None:
                     self.memory_stats["gpu_temperature_history"].append(temperature)
-            except:
+            except (RuntimeError, AttributeError) as e:
+                # Temperature monitoring may not be available on all GPUs
                 temperature = None
 
             return {
@@ -419,7 +436,7 @@ class MemoryManager:
 
     def setup_torch_cuda(self):
         """Configure PyTorch CUDA settings for optimal performance."""
-        if not torch.cuda.is_available():
+        if not TORCH_AVAILABLE or not torch.cuda.is_available():
             return
 
         try:
@@ -457,7 +474,7 @@ class MemoryManager:
 
     def optimize_memory_allocation(self):
         """Optimize memory allocation across all available GPUs.
-        
+
         This method:
         1. Forces garbage collection
         2. Clears CUDA cache
@@ -465,7 +482,7 @@ class MemoryManager:
         4. Manages memory fragmentation
         5. Records optimization history
         """
-        if not torch.cuda.is_available():
+        if not TORCH_AVAILABLE or not torch.cuda.is_available():
             return
 
         try:
@@ -531,14 +548,17 @@ class MemoryManager:
         self, device_id: int, vendor: GPUVendor = GPUVendor.NVIDIA
     ) -> Dict[str, float]:
         """Get memory usage statistics for any GPU vendor.
-        
+
         Args:
             device_id (int): GPU device index
             vendor (GPUVendor, optional): GPU vendor. Defaults to NVIDIA.
-            
+
         Returns:
             Dict[str, float]: Memory usage statistics
         """
+        if not TORCH_AVAILABLE:
+            return {}
+
         try:
             if vendor == GPUVendor.NVIDIA and torch.cuda.is_available():
                 return self._get_nvidia_memory_usage(device_id)
@@ -652,7 +672,7 @@ class MemoryManager:
 
     def cleanup(self):
         """Perform comprehensive memory cleanup across all devices.
-        
+
         This method:
         1. Forces garbage collection
         2. Clears GPU memory caches
@@ -664,7 +684,7 @@ class MemoryManager:
             # Force garbage collection
             gc.collect()
 
-            if torch.cuda.is_available():
+            if TORCH_AVAILABLE and torch.cuda.is_available():
                 # Synchronize before cleanup
                 torch.cuda.synchronize()
 
