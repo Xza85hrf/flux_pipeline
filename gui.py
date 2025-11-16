@@ -1288,7 +1288,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Print the custom URLs
-    print(f"* Running on local URL:  http://localhost:{args.port}")
+    logger.info(f"Starting Gradio interface on http://localhost:{args.port}")
 
     # Create and launch the interface
     demo = create_interface()
