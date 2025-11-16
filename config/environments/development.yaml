@@ -1,0 +1,60 @@
+# Development environment configuration for FluxPipeline
+# Use with: export FLUXPIPELINE_ENV=development
+
+# Environment name
+environment: development
+
+# Logging configuration
+logging:
+  level: DEBUG
+  file: flux_pipeline_dev.log
+  console: true
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# GPU configuration
+gpu:
+  vendor: cuda  # cuda, rocm, intel, cpu
+  visible_devices: "0"  # Comma-separated GPU IDs
+  memory_threshold: 0.85  # Lower threshold for development
+
+# Model configuration
+model:
+  name: black-forest-labs/FLUX.1-schnell
+  torch_dtype: float16
+  cache_dir: ~/.cache/huggingface
+  attention_slicing: true  # Enabled for development
+  enable_model_cpu_offload: false
+
+# Generation defaults
+generation:
+  default_height: 512  # Smaller for faster iteration
+  default_width: 512
+  default_steps: 4
+  default_guidance_scale: 0.0
+  seed_profile: balanced
+
+# Workspace configuration
+workspace:
+  base_dir: ./workspace_dev
+  create_timestamped_dirs: true
+  save_metadata: true
+
+# Performance settings
+performance:
+  enable_profiling: true
+  enable_metrics: true
+  save_metrics: true
+  metrics_file: ./metrics_dev.json
+
+# Debug settings
+debug:
+  save_intermediate_outputs: true
+  verbose_errors: true
+  enable_memory_tracking: true
+  log_model_info: true
+
+# Safety settings
+safety:
+  max_batch_size: 10
+  timeout_seconds: 300
+  enable_oom_protection: true
