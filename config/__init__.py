@@ -4,6 +4,7 @@ This package contains configuration and setup utilities:
     - Environment configuration and hardware detection
     - Logging setup with colored output
     - Default model configurations
+    - Configuration validation
 """
 
 from .env_config import (
@@ -13,6 +14,7 @@ from .env_config import (
     DEFAULT_GENERATION_CONFIG,
 )
 from .logging_config import logger, setup_logging, ColorFormatter
+from .validator import ConfigValidator, validate_and_log
 
 __all__ = [
     # Environment Configuration
@@ -24,4 +26,7 @@ __all__ = [
     "logger",
     "setup_logging",
     "ColorFormatter",
+    # Validation
+    "ConfigValidator",
+    "validate_and_log",
 ]
