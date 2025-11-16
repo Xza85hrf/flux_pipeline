@@ -39,7 +39,8 @@ venv.bak/
 
 # Jupyter Notebook
 .ipynb_checkpoints
-*.ipynb
+# Note: We track example notebooks in examples/
+# Add specific notebooks to .gitignore if they contain sensitive data
 
 # PyTest
 .pytest_cache/

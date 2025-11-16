@@ -61,9 +61,9 @@ RUN python -c "from pathlib import Path; from config.logging_config import setup
 # Expose the application port
 EXPOSE 7860
 
-# Healthcheck to verify Gradio service status
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:7860/ || exit 1
+# Healthcheck using our health check module
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python -c "from api.health import health_check_simple; health_check_simple()" || exit 1
 
 # Set the command to run the application with updated arguments
 CMD ["python3", "-u", "gui.py", "--host", "0.0.0.0", "--port", "7860", "--share"]
