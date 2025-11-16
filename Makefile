@@ -175,6 +175,36 @@ docker-compose-down: ## Stop docker-compose services
 	@echo "$(BLUE)Stopping docker-compose services...$(NC)"
 	docker-compose down
 
+
+##@ Documentation
+
+docs-install: ## Install documentation dependencies
+	@echo "$(BLUE)Installing documentation dependencies...$(NC)"
+	$(PIP) install -r docs/requirements-docs.txt
+	@echo "$(GREEN)✓ Documentation dependencies installed!$(NC)"
+
+docs-build: ## Build documentation with Sphinx
+	@echo "$(BLUE)Building documentation...$(NC)"
+	cd docs && sphinx-build -b html . _build/html
+	@echo "$(GREEN)✓ Documentation built! Open docs/_build/html/index.html$(NC)"
+
+docs-serve: ## Serve documentation locally
+	@echo "$(BLUE)Serving documentation at http://localhost:8000$(NC)"
+	cd docs/_build/html && $(PYTHON) -m http.server 8000
+
+docs-clean: ## Clean documentation build
+	@echo "$(BLUE)Cleaning documentation build...$(NC)"
+	rm -rf docs/_build docs/.doctrees
+	@echo "$(GREEN)✓ Documentation cleaned!$(NC)"
+
+docs-rebuild: docs-clean docs-build ## Clean and rebuild documentation
+	@echo "$(GREEN)✓ Documentation rebuilt!$(NC)"
+
+docs-check: ## Check documentation for errors
+	@echo "$(BLUE)Checking documentation...$(NC)"
+	cd docs && sphinx-build -b html -W --keep-going . _build/html
+	@echo "$(GREEN)✓ Documentation check complete!$(NC)"
+
 ##@ Maintenance
 
 clean: ## Clean temporary files and caches
