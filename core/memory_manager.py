@@ -351,7 +351,8 @@ class MemoryManager:
                 )
                 if temperature is not None:
                     self.memory_stats["gpu_temperature_history"].append(temperature)
-            except:
+            except (RuntimeError, AttributeError) as e:
+                # Temperature monitoring may not be available on all GPUs
                 temperature = None
 
             return {
