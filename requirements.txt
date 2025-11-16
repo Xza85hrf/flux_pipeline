@@ -5,9 +5,9 @@ torchaudio==2.5.0
 xformers==0.0.28.post2
 
 # Machine learning libraries
-diffusers==0.34.0
+diffusers==0.35.2
 transformers==4.57.1
-accelerate==1.2.1
+accelerate==1.11.0
 safetensors==0.4.5
 huggingface-hub==0.27.0
 sentencepiece==0.1.99
