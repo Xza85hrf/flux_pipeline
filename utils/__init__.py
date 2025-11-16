@@ -2,6 +2,7 @@
 
 This package contains utility functions for:
     - Performance logging and monitoring
+    - Performance metrics collection and analysis
     - System utilities and workspace management
     - NLTK setup and text processing
 """
@@ -18,6 +19,11 @@ from .system_utils import (
     generate_output_path,
     safe_import,
 )
+from .metrics import (
+    PerformanceMetrics,
+    get_global_metrics,
+    log_metric,
+)
 
 __all__ = [
     # Logging Utilities
@@ -30,4 +36,8 @@ __all__ = [
     "setup_nltk",
     "generate_output_path",
     "safe_import",
+    # Performance Metrics
+    "PerformanceMetrics",
+    "get_global_metrics",
+    "log_metric",
 ]
