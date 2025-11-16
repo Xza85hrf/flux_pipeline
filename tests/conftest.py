@@ -7,11 +7,18 @@ including mock GPU environments, test data generators, and common test utilities
 import sys
 import os
 import pytest
-import PIL.Image
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 from typing import Dict, Any, Generator
 import asyncio
+
+# Make PIL import optional
+try:
+    import PIL.Image
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
+    PIL = None
 
 # Try to import torch, but make it optional
 try:
