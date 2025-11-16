@@ -1,0 +1,111 @@
+# Coverage.py configuration file
+# https://coverage.readthedocs.io/en/latest/config.html
+
+[run]
+# Source code to measure
+source = .
+
+# Directories or files to omit from measurement
+omit =
+    */tests/*
+    */test_*
+    */__pycache__/*
+    */venv/*
+    */.venv/*
+    */env/*
+    */ENV/*
+    setup.py
+    */site-packages/*
+    */.eggs/*
+    */build/*
+    */dist/*
+
+# Enable branch coverage
+branch = True
+
+# Parallel mode for multi-process coverage
+parallel = False
+
+# Datafile for storing coverage data
+data_file = .coverage
+
+# Plugins to use
+plugins =
+
+[report]
+# Exclude lines from coverage report
+exclude_lines =
+    # Standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code
+    def __repr__
+    def __str__
+
+    # Don't complain if tests don't hit defensive assertion code
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    if typing.TYPE_CHECKING:
+
+    # Don't complain about abstract methods
+    @(abc\.)?abstractmethod
+    @(abc\.)?abstractproperty
+
+    # Don't complain about protocol methods
+    class .*\bProtocol\):
+    @runtime_checkable
+
+    # Don't complain about pass statements
+    ^\s*pass\s*$
+
+    # Don't complain about ellipsis
+    ^\s*\.\.\.\s*$
+
+# Ignore errors
+ignore_errors = False
+
+# Skip covered files
+skip_covered = False
+
+# Skip empty files
+skip_empty = False
+
+# Precision for coverage percentages
+precision = 2
+
+# Show missing lines
+show_missing = True
+
+# Sort by coverage percentage
+sort = Cover
+
+[html]
+# HTML output directory
+directory = htmlcov
+
+# Title for the HTML report
+title = FluxPipeline Coverage Report
+
+[xml]
+# XML output file
+output = coverage.xml
+
+[json]
+# JSON output file
+output = coverage.json
+
+# Pretty print JSON
+pretty_print = True
+
+# Show contexts
+show_contexts = True
+
+[paths]
+# Map paths for combined coverage from different environments
+source =
+    .
+    */site-packages/
