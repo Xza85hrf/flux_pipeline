@@ -25,8 +25,15 @@ Note:
 """
 
 import os
-import torch
 from typing import Dict, List
+
+# Make torch import optional for environments without GPU dependencies
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    torch = None
 
 
 def _get_gpu_device_list() -> str:
@@ -48,6 +55,9 @@ def _get_gpu_device_list() -> str:
         ```
     """
     devices = []
+
+    if not TORCH_AVAILABLE:
+        return ""
 
     # Check NVIDIA GPUs through CUDA
     if torch.cuda.is_available():
@@ -202,7 +212,7 @@ DEFAULT_MODEL_CONFIG: Dict[str, any] = {
 }
 
 # Default generation parameters
-GENERATION_DEFAULTS: Dict[str, any] = {
+DEFAULT_GENERATION_CONFIG: Dict[str, any] = {
     "default_steps": 4,  # Number of generation steps
     "guidance_scale": 0.0,  # Guidance scale for generation
     "height": 1024,  # Default output image height

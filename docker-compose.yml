@@ -1,0 +1,233 @@
+version: '3.8'
+
+# FluxPipeline Docker Compose Configuration
+# Usage:
+#   docker-compose up               # Start default (CPU) service
+#   docker-compose up flux-cuda     # Start with CUDA support
+#   docker-compose up flux-dev      # Start development environment
+
+services:
+  # ============================================================================
+  # CPU-only service (default)
+  # ============================================================================
+  flux-cpu:
+    container_name: flux_pipeline_cpu
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+    image: flux_pipeline:cpu
+    ports:
+      - "7860:7860"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+      - GRADIO_SERVER_NAME=0.0.0.0
+    volumes:
+      - ./workspace:/app/workspace
+      - ./output:/app/output
+      - model_cache:/root/.cache/huggingface
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '8'
+          memory: 16G
+        reservations:
+          cpus: '4'
+          memory: 8G
+
+  # ============================================================================
+  # CUDA GPU service
+  # ============================================================================
+  flux-cuda:
+    container_name: flux_pipeline_cuda
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+    image: flux_pipeline:cuda
+    ports:
+      - "7860:7860"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+      - ./workspace:/app/workspace
+      - ./output:/app/output
+      - model_cache:/root/.cache/huggingface
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ============================================================================
+  # ROCm AMD GPU service
+  # ============================================================================
+  flux-rocm:
+    container_name: flux_pipeline_rocm
+    build:
+      context: .
+      dockerfile: Dockerfile.rocm
+    image: flux_pipeline:rocm
+    ports:
+      - "7860:7860"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+      - GRADIO_SERVER_NAME=0.0.0.0
+    volumes:
+      - ./workspace:/app/workspace
+      - ./output:/app/output
+      - model_cache:/root/.cache/huggingface
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    group_add:
+      - video
+      - render
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ============================================================================
+  # Intel OneAPI service
+  # ============================================================================
+  flux-intel:
+    container_name: flux_pipeline_intel
+    build:
+      context: .
+      dockerfile: Dockerfile.intel
+    image: flux_pipeline:intel
+    ports:
+      - "7860:7860"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+      - GRADIO_SERVER_NAME=0.0.0.0
+    volumes:
+      - ./workspace:/app/workspace
+      - ./output:/app/output
+      - model_cache:/root/.cache/huggingface
+      - /dev/dri:/dev/dri
+    devices:
+      - /dev/dri
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ============================================================================
+  # Development environment with volume mounts
+  # ============================================================================
+  flux-dev:
+    container_name: flux_pipeline_dev
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+      target: development
+    image: flux_pipeline:dev
+    ports:
+      - "7860:7860"
+      - "8888:8888"  # Jupyter
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=DEBUG
+      - GRADIO_SERVER_NAME=0.0.0.0
+    volumes:
+      # Mount source code for live development
+      - ./config:/app/config
+      - ./core:/app/core
+      - ./pipeline:/app/pipeline
+      - ./utils:/app/utils
+      - ./tests:/app/tests
+      - ./main.py:/app/main.py
+      - ./gui.py:/app/gui.py
+      # Mount data directories
+      - ./workspace:/app/workspace
+      - ./output:/app/output
+      - model_cache:/root/.cache/huggingface
+    command: python gui.py --host 0.0.0.0 --port 7860
+    restart: unless-stopped
+
+# ============================================================================
+# Shared volumes
+# ============================================================================
+volumes:
+  # Shared model cache to avoid re-downloading
+  model_cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${MODEL_CACHE_PATH:-./.cache/huggingface}
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  default:
+    name: flux_pipeline_network
+    driver: bridge
+
+# ============================================================================
+# Usage Examples
+# ============================================================================
+# Start CPU service:
+#   docker-compose up flux-cpu
+#
+# Start CUDA service with GPU:
+#   docker-compose up flux-cuda
+#
+# Start in background:
+#   docker-compose up -d flux-cuda
+#
+# View logs:
+#   docker-compose logs -f flux-cuda
+#
+# Stop services:
+#   docker-compose down
+#
+# Rebuild and start:
+#   docker-compose up --build flux-cuda
+#
+# Development mode with live code reload:
+#   docker-compose up flux-dev
+#
+# Run tests:
+#   docker-compose run --rm flux-dev pytest
+#
+# Access shell in running container:
+#   docker-compose exec flux-cuda /bin/bash
+#
+# Clean up everything:
+#   docker-compose down -v --rmi all

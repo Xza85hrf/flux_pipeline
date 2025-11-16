@@ -31,12 +31,19 @@ Note:
     appropriate fallbacks when certain GPU types are unavailable.
 """
 
-import torch
 import platform
 from enum import Enum
 from dataclasses import dataclass
 from typing import List, Dict, Optional, Callable
 from config.logging_config import logger
+
+# Make torch import optional
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    torch = None
 
 
 class GPUVendor(Enum):
@@ -141,18 +148,22 @@ class MultiGPUManager:
 
     def _detect_gpus(self):
         """Detect and initialize all available GPUs across vendors.
-        
+
         This method:
         1. Checks for NVIDIA GPUs using CUDA
         2. Checks for AMD GPUs using ROCm/HIP
         3. Checks for Intel GPUs using OneAPI/IPEX
         4. Falls back to CPU if no GPUs are detected
-        
+
         Note:
             GPU detection order matters for systems with multiple vendor drivers.
             NVIDIA is checked first due to better driver stability and support.
         """
         self.available_gpus = []
+
+        if not TORCH_AVAILABLE:
+            logger.warning("PyTorch is not available. No GPUs detected. Falling back to CPU.")
+            return
 
         # Primary check for NVIDIA GPUs (most common)
         if torch.cuda.is_available():
@@ -273,9 +284,9 @@ class MultiGPUManager:
         except Exception as e:
             logger.warning(f"Error setting up Intel GPU: {e}")
 
-    def get_optimal_devices(self) -> List[torch.device]:
+    def get_optimal_devices(self) -> List:
         """Get a prioritized list of optimal devices for computation.
-        
+
         This method returns devices in order of computational efficiency:
         1. NVIDIA GPUs (fastest for deep learning)
         2. AMD GPUs (good for compute workloads)
@@ -289,12 +300,15 @@ class MultiGPUManager:
             ```python
             manager = MultiGPUManager()
             devices = manager.get_optimal_devices()
-            
+
             # Use the first (best) device
             model = model.to(devices[0])
             ```
         """
         devices = []
+
+        if not TORCH_AVAILABLE:
+            return devices
 
         # Add devices in priority order
         for gpu in self.available_gpus:
@@ -313,7 +327,7 @@ class MultiGPUManager:
 
     def distribute_model(self, model, batch_size: int = 1):
         """Distribute a model across available GPUs for parallel processing.
-        
+
         This method implements two parallelization strategies:
         1. Model-specific parallelization (if supported)
         2. DataParallel as a fallback option
@@ -329,12 +343,12 @@ class MultiGPUManager:
             ```python
             manager = MultiGPUManager()
             model = MyModel()
-            
+
             # Distribute model across available GPUs
             distributed_model = manager.distribute_model(model, batch_size=32)
             ```
         """
-        if len(self.available_gpus) <= 1:
+        if not TORCH_AVAILABLE or len(self.available_gpus) <= 1:
             return model
 
         if hasattr(model, "parallelize"):
@@ -379,7 +393,7 @@ class MultiGPUManager:
 
     def optimize_memory(self):
         """Optimize GPU memory usage across all available devices.
-        
+
         This method:
         1. Clears unused memory caches
         2. Performs vendor-specific optimizations
@@ -388,14 +402,17 @@ class MultiGPUManager:
         Example:
             ```python
             manager = MultiGPUManager()
-            
+
             # Run some GPU operations
             # ...
-            
+
             # Optimize memory usage
             manager.optimize_memory()
             ```
         """
+        if not TORCH_AVAILABLE:
+            return
+
         for gpu in self.available_gpus:
             if gpu.vendor == GPUVendor.NVIDIA:
                 with torch.cuda.device(gpu.index):
