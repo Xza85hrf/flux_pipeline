@@ -97,7 +97,7 @@ FluxPipeline can be installed using a virtual environment (recommended) or via D
 Before proceeding, ensure you have the following installed:
 
 - **Git:** [Download and install Git](https://git-scm.com/downloads)
-- **Python 3.8 or higher:** [Download and install Python](https://www.python.org/downloads/)
+- **Python 3.10 or higher:** [Download and install Python](https://www.python.org/downloads/) (Python 3.11-3.13 recommended)
 - **Anaconda (Recommended):** [Download and install Anaconda](https://www.anaconda.com/products/distribution)
 - **Docker:** [Download and install Docker](https://docs.docker.com/get-docker/) (if using Docker installation)
 
@@ -117,11 +117,11 @@ We recommend using Anaconda to manage your Python environments. Detailed instruc
    Create and activate a conda environment to isolate project dependencies.
 
    ```bash
-   conda create -n flux python=3.11 -y
+   conda create -n flux python=3.12 -y
    conda activate flux
    ```
 
-   *Explanation:* This creates a new environment named `flux` with Python 3.11.
+   *Explanation:* This creates a new environment named `flux` with Python 3.12. You can also use Python 3.11 or 3.13.
 
 3. **Install Dependencies**
 

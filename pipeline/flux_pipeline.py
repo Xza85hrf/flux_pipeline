@@ -321,7 +321,8 @@ class FluxPipeline:
                 return 1
             else:
                 return 1
-        except:
+        except (RuntimeError, AttributeError):
+            # GPU may not be available or properties cannot be queried
             return 1
 
     def _enable_memory_efficient_settings(self):
