@@ -2,9 +2,9 @@
 --extra-index-url https://download.pytorch.org/whl/cu124
 
 # Core dependencies with CUDA support
-torch==2.5.0+cu124
-torchvision==0.20.0+cu124
-torchaudio==2.5.0+cu124
+torch==2.9.1
+torchvision==0.24.1
+torchaudio==2.9.1
 xformers==0.0.28.post2
 cuda-python==12.6.0
 
