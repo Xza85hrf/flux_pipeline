@@ -54,7 +54,7 @@ rich==13.9.3
 
 # Development tools (same as requirements.txt)
 ruff==0.7.1
-black==24.10.0
+black==25.12.0
 
 # Testing tools (same as requirements.txt)
 pytest==8.3.4
