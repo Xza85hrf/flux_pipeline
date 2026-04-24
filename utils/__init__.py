@@ -8,16 +8,18 @@ This package contains utility functions for:
 """
 
 from .logging_utils import (
-    setup_performance_logging,
-    log_performance,
-    PerformanceLogger,
+    LogManager,
+    setup_session_logging,
+    performance_logger,
+    log_generation_stats,
 )
 from .system_utils import (
     setup_workspace,
     suppress_warnings,
     setup_nltk,
-    generate_output_path,
-    safe_import,
+    get_unique_filename,
+    safe_import_xformers,
+    safe_import_flux,
 )
 from .metrics import (
     PerformanceMetrics,
@@ -27,15 +29,17 @@ from .metrics import (
 
 __all__ = [
     # Logging Utilities
-    "setup_performance_logging",
-    "log_performance",
-    "PerformanceLogger",
+    "LogManager",
+    "setup_session_logging",
+    "performance_logger",
+    "log_generation_stats",
     # System Utilities
     "setup_workspace",
     "suppress_warnings",
     "setup_nltk",
-    "generate_output_path",
-    "safe_import",
+    "get_unique_filename",
+    "safe_import_xformers",
+    "safe_import_flux",
     # Performance Metrics
     "PerformanceMetrics",
     "get_global_metrics",
