@@ -65,7 +65,7 @@ from utils.system_utils import (
     get_unique_filename,
 )
 from config.logging_config import logger
-from config.env_config import DEFAULT_MODEL_CONFIG, GENERATION_DEFAULTS
+from config.env_config import DEFAULT_MODEL_CONFIG, DEFAULT_GENERATION_CONFIG
 
 
 class FluxPipeline:
@@ -157,8 +157,8 @@ class FluxPipeline:
             Dict[str, Any]: Default generation parameters
         """
         return {
-            "default_steps": GENERATION_DEFAULTS["default_steps"],
-            "default_guidance": GENERATION_DEFAULTS["guidance_scale"],
+            "default_steps": DEFAULT_GENERATION_CONFIG["default_steps"],
+            "default_guidance": DEFAULT_GENERATION_CONFIG["guidance_scale"],
             "min_height": 512,
             "min_width": 512,
             "max_height": 1024,
