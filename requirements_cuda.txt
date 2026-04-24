@@ -1,62 +1,68 @@
-# Extra index for CUDA wheels
---extra-index-url https://download.pytorch.org/whl/cu124
+# Extra index for CUDA wheels. cu128 hosts the widest set of Python 3.13
+# wheels (torch/torchvision/torchaudio up to 2.11 / 0.26). The CUDA 12.8
+# runtime is backward compatible with any NVIDIA driver >= R550 (CUDA 12.x+).
+--extra-index-url https://download.pytorch.org/whl/cu128
 
-# Core dependencies with CUDA support
-torch==2.5.0+cu124
-torchvision==0.20.0+cu124
-torchaudio==2.5.0+cu124
-xformers==0.0.28.post2
-cuda-python==12.6.0
+# Core dependencies with CUDA support.
+# Pin with the +cu128 local-version suffix so pip selects from the
+# PyTorch index rather than the CPU-only generic wheel on PyPI.
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+torchaudio==2.11.0+cu128
+# xformers wheels on PyPI link against the torch ABI and follow torch's
+# CUDA runtime; 0.0.29 is the first release compatible with torch 2.6+.
+xformers>=0.0.29
+cuda-python>=12.8.0
 
 # Machine learning libraries
-diffusers==0.36.0
-transformers==4.57.3
-accelerate==1.12.0
-safetensors==0.4.5
-huggingface-hub==0.27.0
-sentencepiece==0.1.99
+diffusers>=0.36.0
+transformers>=4.57.0
+accelerate>=1.12.0
+safetensors>=0.4.5
+huggingface-hub>=0.27.0
+sentencepiece>=0.1.99
 protobuf
 grpcio
 grpcio-tools
 
 # Utility libraries (same as requirements.txt)
-numpy==2.1.2
-Pillow==11.0.0
-psutil==6.1.0
-tqdm==4.66.6
-pynvml==11.5.3
-fsspec==2024.10.0
-PyYAML==6.0.2
-networkx==3.4.2
-sympy==1.13.1
-filelock==3.16.1
-typing_extensions==4.12.2
-regex==2024.9.11
-nltk==3.9.1
-jinja2==3.1.4
+numpy>=2.1
+Pillow>=11.0
+psutil>=6.1
+tqdm>=4.66
+pynvml>=11.5
+fsspec>=2024.10
+PyYAML>=6.0
+networkx>=3.4
+sympy>=1.13
+filelock>=3.16
+typing_extensions>=4.12
+regex>=2024.9
+nltk>=3.9
+jinja2>=3.1
 
 # Web and API libraries (same as requirements.txt)
-gradio==5.4.0
-fastapi==0.115.6
-uvicorn==0.34.0
-python-multipart==0.0.12
-aiofiles==23.2.1
-orjson==3.10.10
-websockets==12.0
+gradio>=5.4
+fastapi>=0.115
+uvicorn>=0.34
+python-multipart>=0.0.12
+aiofiles>=23.2
+orjson>=3.10
+websockets>=12.0
 
 # Image processing libraries (same as requirements.txt)
-opencv-python==4.10.0.84
-scikit-image==0.24.0
+opencv-python>=4.10
+scikit-image>=0.24
 
 # Miscellaneous libraries (same as requirements.txt)
-cachetools==5.3.1
-rich==13.9.3
+cachetools>=5.3
+rich>=13.9
 
 # Development tools (same as requirements.txt)
-ruff==0.7.1
-black==24.10.0
+ruff>=0.7
+black>=24.10
 
 # Testing tools (same as requirements.txt)
-pytest==8.3.4
-pytest-cov==6.0.0
-mypy==1.14.0
+pytest>=8.3
+pytest-cov>=6.0
+mypy>=1.14
