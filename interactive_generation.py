@@ -24,11 +24,18 @@ from config.logging_config import logger
 
 
 class InteractiveGenerator:
-    def __init__(self):
+    def __init__(self, model_id: str = None):
         """
         Initialize the InteractiveGenerator.
 
-        This method sets up the environment, suppresses warnings, initializes the workspace, and creates an instance of the FluxPipeline.
+        Sets up the environment, suppresses warnings, initializes the
+        workspace, and creates an instance of the FluxPipeline. Defers to
+        DEFAULT_MODEL_CONFIG (which honors FLUX_MODEL_ID) when model_id
+        is not provided.
+
+        Args:
+            model_id: Optional HuggingFace repo ID to load. Falls back to
+                DEFAULT_MODEL_CONFIG["model_id"] when None.
         """
         # Setup environment and CUDA settings
         setup_environment()
@@ -39,9 +46,11 @@ class InteractiveGenerator:
         if torch.cuda.is_available():
             os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
-        # Initialize pipeline
+        # Initialize pipeline; resolve model from param > env var > default.
+        from config.env_config import DEFAULT_MODEL_CONFIG
+        resolved_model = model_id or DEFAULT_MODEL_CONFIG["model_id"]
         self.pipeline = FluxPipeline(
-            model_id="model here",
+            model_id=resolved_model,
             memory_threshold=0.90,
             max_retries=3,
             enable_xformers=False,
@@ -279,8 +288,22 @@ class InteractiveGenerator:
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Interactive FluxPipeline generation")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=None,
+        help=(
+            "HuggingFace repo ID of the diffusion model to load. "
+            "Falls back to $FLUX_MODEL_ID or the default FLUX.1-schnell."
+        ),
+    )
+    args = parser.parse_args()
+
     try:
-        generator = InteractiveGenerator()
+        generator = InteractiveGenerator(model_id=args.model)
         generator.run()
     except KeyboardInterrupt:
         print("\nGeneration interrupted by user.")

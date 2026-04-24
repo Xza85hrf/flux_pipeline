@@ -13,9 +13,19 @@ The module showcases various generation scenarios including:
 - Generation with custom parameters
 
 Example:
-    Run the application:
+    Run with the default FLUX.1-schnell model:
     ```bash
     python main.py
+    ```
+
+    Run with a different HuggingFace repo via CLI flag:
+    ```bash
+    python main.py --model stabilityai/sdxl-turbo
+    ```
+
+    Run with a different repo via environment variable:
+    ```bash
+    FLUX_MODEL_ID=stabilityai/sdxl-turbo python main.py
     ```
 
 Note:
@@ -23,16 +33,17 @@ Note:
     and proper error handling for production use.
 """
 
+import argparse
 from config.logging_config import logger  # Fix incorrect import from venv
 import warnings
 from pathlib import Path
-from config.env_config import setup_environment
+from config.env_config import setup_environment, DEFAULT_MODEL_CONFIG
 from utils.system_utils import setup_workspace, suppress_warnings, setup_nltk
 from pipeline.flux_pipeline import FluxPipeline
 from core.seed_manager import SeedProfile
 
 
-def main():
+def main(model_id: str = None):
     """Main execution function for the FluxPipeline system.
 
     This function:
@@ -63,9 +74,12 @@ def main():
     setup_nltk()  # Initialize NLTK for text processing
     workspace = setup_workspace()  # Setup directory structure
 
-    # Initialize generation pipeline
-    logger.info("Initializing FluxPipeline...")
-    pipeline = FluxPipeline(workspace=workspace)
+    # Initialize generation pipeline. When model_id is None the pipeline
+    # falls back to DEFAULT_MODEL_CONFIG["model_id"], which itself honors
+    # the FLUX_MODEL_ID environment variable.
+    resolved_model = model_id or DEFAULT_MODEL_CONFIG["model_id"]
+    logger.info(f"Initializing FluxPipeline with model '{resolved_model}'...")
+    pipeline = FluxPipeline(model_id=resolved_model, workspace=workspace)
 
     # Load model with error handling
     if not pipeline.load_model():
@@ -112,13 +126,26 @@ def main():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="FluxPipeline image generation")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=None,
+        help=(
+            "HuggingFace repo ID of the diffusion model to load "
+            "(default: %(default)s). Can also be set via the FLUX_MODEL_ID "
+            "environment variable."
+        ),
+    )
+    args = parser.parse_args()
+
     # Suppress warnings during execution
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
         try:
             # Run main function
-            main()
+            main(model_id=args.model)
         except KeyboardInterrupt:
             # Handle user interruption gracefully
             logger.info("Generation interrupted by user")

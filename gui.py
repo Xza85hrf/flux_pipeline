@@ -41,22 +41,36 @@ import gradio as gr
 from PIL import Image, ImageEnhance
 import torch
 
-from config.env_config import setup_environment
+from config.env_config import setup_environment, DEFAULT_MODEL_CONFIG
 from pipeline.flux_pipeline import FluxPipeline
 from core.seed_manager import SeedProfile
 from utils.system_utils import setup_workspace, suppress_warnings
 from config.logging_config import logger
 
-# Initialize environment and pipeline
+# Initialize environment but defer pipeline construction to __main__ so
+# the --model CLI flag can feed the model ID without a second import
+# cycle. Handler closures below reference the module-global `pipeline`,
+# which is rebound in _init_pipeline() before create_interface() runs.
 suppress_warnings()
 setup_environment()
 workspace = setup_workspace()
-pipeline = FluxPipeline(workspace=workspace)
+pipeline = None
 
-# Load model at startup
-if not pipeline.load_model():
-    logger.error("Failed to load the model. Exiting.")
-    exit(1)
+
+def _init_pipeline(model_id: str = None) -> None:
+    """Construct the module-global FluxPipeline and load model weights.
+
+    Handler functions reference the module-level `pipeline` by name, so
+    they pick up whatever we rebind here before the Gradio interface is
+    launched.
+    """
+    global pipeline
+    resolved_model = model_id or DEFAULT_MODEL_CONFIG["model_id"]
+    logger.info(f"Initializing FluxPipeline with model '{resolved_model}'...")
+    pipeline = FluxPipeline(model_id=resolved_model, workspace=workspace)
+    if not pipeline.load_model():
+        logger.error("Failed to load the model. Exiting.")
+        exit(1)
 
 # Initialize history storage
 HISTORY_FILE = workspace / "history.json"
@@ -1284,8 +1298,23 @@ if __name__ == "__main__":
     # Add an argument to specify the host to bind to
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to bind to")
 
+    # Add an argument to select the diffusion model at startup
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=None,
+        help=(
+            "HuggingFace repo ID of the diffusion model to load. "
+            "Falls back to $FLUX_MODEL_ID or the default FLUX.1-schnell."
+        ),
+    )
+
     # Parse the command-line arguments
     args = parser.parse_args()
+
+    # Initialize the pipeline with the resolved model before any handler
+    # closures are wired into the Gradio interface.
+    _init_pipeline(model_id=args.model)
 
     # Print the custom URLs
     logger.info(f"Starting Gradio interface on http://localhost:{args.port}")

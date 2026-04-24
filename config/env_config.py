@@ -201,9 +201,14 @@ def ensure_environment() -> None:
     setup_environment(force=False)
 
 
+# Default base model this project is written against. Users can override
+# on a per-invocation basis by setting FLUX_MODEL_ID in the environment
+# or by passing --model on the command line (see main.py / gui.py).
+DEFAULT_FLUX_MODEL_ID: str = "black-forest-labs/FLUX.1-schnell"
+
 # Default model configuration settings
 DEFAULT_MODEL_CONFIG: Dict[str, any] = {
-    "model_id": "<model here>",  # Default model identifier
+    "model_id": os.environ.get("FLUX_MODEL_ID", DEFAULT_FLUX_MODEL_ID),
     "memory_threshold": 0.90,  # Maximum memory utilization threshold (90%)
     "max_retries": 3,  # Maximum retry attempts for model operations
     "enable_xformers": False,  # Memory-efficient attention disabled by default

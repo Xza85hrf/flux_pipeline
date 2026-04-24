@@ -333,8 +333,39 @@ Docker simplifies the setup process by packaging the application and its depende
 
 ## Configuration
 
+### Model Selection
+
+The pipeline loads `black-forest-labs/FLUX.1-schnell` by default. You can
+point it at any HuggingFace diffusion repo that is signature-compatible
+with `FluxPipeline.from_pretrained` in one of three ways (command-line
+flag takes precedence, then environment variable, then the default):
+
+1. **`--model` CLI flag** on `main.py`, `gui.py`, and
+   `interactive_generation.py`:
+
+   ```bash
+   python main.py --model stabilityai/sdxl-turbo
+   python gui.py --model stabilityai/sdxl-turbo
+   python interactive_generation.py --model stabilityai/sdxl-turbo
+   ```
+
+2. **`FLUX_MODEL_ID` environment variable** (useful for Docker and CI):
+
+   ```bash
+   export FLUX_MODEL_ID="stabilityai/sdxl-turbo"
+   python main.py
+   ```
+
+3. **Edit the default** at `config/env_config.py:DEFAULT_FLUX_MODEL_ID`
+   if you want a different model to be the project-wide default.
+
+> **Note:** Switching to a non-FLUX model may require adjusting
+> `num_inference_steps`, `guidance_scale`, and resolution — FLUX.1-schnell
+> is tuned for 1–4 steps with `guidance_scale=0.0`.
+
 ### Environment Variables
 
+- `FLUX_MODEL_ID`: HuggingFace repo ID of the diffusion model to load.
 - `CUDA_VISIBLE_DEVICES`: Control GPU visibility.
 - `PYTORCH_CUDA_ALLOC_CONF`: Memory allocation settings.
 - `KMP_DUPLICATE_LIB_OK`: Intel library configuration.

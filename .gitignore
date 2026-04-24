@@ -128,3 +128,8 @@ docker-compose.override.yml
 docs/_build/
 docs/.doctrees/
 site/
+
+# Runtime state produced by the pipeline
+seed_history.txt
+generated_images/
+history.json

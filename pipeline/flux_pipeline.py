@@ -95,7 +95,7 @@ class FluxPipeline:
     Example:
         ```python
         pipeline = FluxPipeline(
-            model_id="<model here>",
+            model_id="black-forest-labs/FLUX.1-schnell",
             memory_threshold=0.90,
             max_retries=3
         )
