@@ -46,22 +46,10 @@ logger.info(f"Running on local URL: http://localhost:{args.port}")
 - core/seed_manager.py (9 instances)
 - gui.py (1 instance - line 1291)
 
-### 2. Add Version Tracking
-**Impact**: High - Package management and deployment
-**Effort**: Low (30 minutes)
-
-**Create `_version.py`**:
-```python
-"""Version information for FluxPipeline."""
-
-__version__ = "0.1.0"
-__version_info__ = (0, 1, 0)
-
-# Version history
-VERSION_HISTORY = {
-    "0.1.0": "Initial release with FLUX.1-schnell support"
-}
-```
+### 2. Add Version Tracking — ✅ DONE
+**Status**: Already implemented in `_version.py` at the repo root.
+Exposes `__version__`, `__version_info__`, `__author__`, `__license__`,
+`__url__`, `VERSION_HISTORY`, `get_version()`, and `get_version_info()`.
 
 **Update `__init__.py`**:
 ```python

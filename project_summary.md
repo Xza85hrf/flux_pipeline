@@ -217,7 +217,7 @@ flowchart LR
 
 ### System Requirements
 
-- **Python:** 3.8+
+- **Python:** 3.10+ (enforced by `pyproject.toml`; CUDA wheels require 3.10–3.13)
 - **GPU:** CUDA-compatible GPU recommended.
 - **RAM:** 8 GB minimum.
 - **GPU VRAM:** 4 GB+ recommended.

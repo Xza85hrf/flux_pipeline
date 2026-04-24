@@ -297,39 +297,29 @@ Docker simplifies the setup process by packaging the application and its depende
 
 ### Command Line Interface
 
-1. **Basic Generation**
+`main.py` runs a built-in demo that generates three images with different
+seed profiles plus one manual-seed generation, using a hardcoded example
+prompt (see `main()` in `main.py`). It is intended as a sanity check that
+the pipeline loads and produces output, not as a full-featured CLI.
 
-   ```bash
-   python main.py --prompt "Your prompt here"
-   ```
+```bash
+# Run the demo with the default FLUX.1-schnell model
+python main.py
 
-   *Example:*
+# Swap to a different HuggingFace diffusion model
+python main.py --model stabilityai/sdxl-turbo
+```
 
-   ```bash
-   python main.py --prompt "A futuristic cityscape at sunset"
-   ```
+For interactive control over prompts, negative prompts, seeds, steps, and
+guidance scale, use one of:
 
-2. **Advanced Options**
+- `python gui.py` — Gradio web UI with full parameter controls
+- `python interactive_generation.py` — terminal-driven prompt loop
+- `from pipeline.flux_pipeline import FluxPipeline` — programmatic API
 
-   ```bash
-   python main.py \
-     --prompt "Your prompt" \
-     --negative_prompt "Things to avoid" \
-     --seed 42 \
-     --steps 4 \
-     --guidance_scale 0.0
-   ```
-
-   *Example:*
-
-   ```bash
-   python main.py \
-     --prompt "A serene mountain landscape" \
-     --negative_prompt "No people, no animals" \
-     --seed 123 \
-     --steps 5 \
-     --guidance_scale 7.5
-   ```
+See `pipeline/flux_pipeline.py::generate_image` for the full list of
+generation parameters (prompt, negative_prompt, manual_seed,
+guidance_scale, num_inference_steps, height, width, profile).
 
 ## Configuration
 
