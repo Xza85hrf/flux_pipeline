@@ -44,7 +44,7 @@ uvicorn>=0.34
 python-multipart>=0.0.12
 aiofiles>=23.2
 orjson>=3.10
-websockets>=12.0
+websockets>=16.0
 
 # Image processing libraries (same as requirements.txt)
 opencv-python>=4.10
