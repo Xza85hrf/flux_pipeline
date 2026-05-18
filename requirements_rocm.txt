@@ -35,7 +35,7 @@ filelock>=3.16
 typing_extensions>=4.12
 regex>=2024.9
 nltk>=3.9
-jinja2>=3.1
+jinja2>=3.1.6
 
 # Web and API libraries (same as requirements.txt)
 gradio>=5.4
