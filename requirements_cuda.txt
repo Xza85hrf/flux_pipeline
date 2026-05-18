@@ -6,8 +6,8 @@
 # Core dependencies with CUDA support.
 # Pin with the +cu128 local-version suffix so pip selects from the
 # PyTorch index rather than the CPU-only generic wheel on PyPI.
-torch==2.11.0+cu128
-torchvision==0.26.0+cu128
+torch==2.12.0
+torchvision==0.27.0
 torchaudio==2.11.0+cu128
 # xformers wheels on PyPI link against the torch ABI and follow torch's
 # CUDA runtime; 0.0.29 is the first release compatible with torch 2.6+.

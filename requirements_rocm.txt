@@ -7,9 +7,9 @@
 # Note: the package name is 'torch' (with a +rocmX.Y local-version
 # suffix), not 'torch-hip' — the previous pin referenced a distribution
 # that does not exist on PyPI or the PyTorch index.
-torch==2.9.1+rocm6.3
-torchvision==0.24.1+rocm6.3
-torchaudio==2.9.1+rocm6.3
+torch==2.12.0
+torchvision==0.27.0
+torchaudio==2.11.0+cu128
 
 # Machine learning libraries
 diffusers>=0.36.0
