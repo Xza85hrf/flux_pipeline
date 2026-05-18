@@ -1,7 +1,7 @@
 # Core dependencies with Intel OneAPI / IPEX support.
 # Python 3.13 support landed in IPEX 2.6+; pair torch with a matching
 # minor (IPEX 2.x is ABI-locked to torch 2.x for the same minor).
-torch>=2.8.0
+torch>=2.12.0
 intel-extension-for-pytorch>=2.8.0
 
 # Machine learning libraries
